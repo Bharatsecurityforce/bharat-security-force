@@ -484,33 +484,81 @@ document.addEventListener('DOMContentLoaded', () => {
   const contactForm = document.getElementById('contactForm');
   const formSuccess = document.getElementById('formSuccess');
 
-  if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    if (contactForm) {
+
+     contactForm.addEventListener('submit', async (e) => {
+
       e.preventDefault();
 
-      if (!contactForm.checkValidity()) {
-        contactForm.reportValidity();
-        return;
-      }
+    if (!contactForm.checkValidity()) {
+      contactForm.reportValidity();
+      return;
+    }
 
-      const btn = contactForm.querySelector('.form-submit');
-      btn.innerHTML = `
-        <svg class="spinner" viewBox="0 0 50 50" style="width:18px;height:18px;animation:spin 1s linear infinite;stroke:currentColor;fill:none;stroke-width:5;stroke-linecap:round;display:inline-block;vertical-align:middle;margin-right:8px;">
-          <circle cx="25" cy="25" r="20"></circle>
-        </svg>
-        Sending...
-      `;
-      btn.disabled = true;
+    const btn = contactForm.querySelector('.form-submit');
 
-      setTimeout(() => {
+    btn.innerHTML = `
+      <svg class="spinner" viewBox="0 0 50 50" style="width:18px;height:18px;animation:spin 1s linear infinite;stroke:currentColor;fill:none;stroke-width:5;stroke-linecap:round;display:inline-block;vertical-align:middle;margin-right:8px;">
+        <circle cx="25" cy="25" r="20"></circle>
+      </svg>
+      Sending...`;
+
+     btn.disabled = true;
+
+    const formData = new FormData(contactForm);
+
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
+    try {
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: json
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+
         contactForm.style.display = 'none';
+
         if (formSuccess) {
           formSuccess.style.display = 'block';
-          formSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          formSuccess.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
         }
-      }, 1500);
-    });
-  }
+
+        contactForm.reset();
+
+      } else {
+
+        alert('Something went wrong. Please try again.');
+
+        console.log(result);
+
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert('Submission failed.');
+
+    }
+
+    btn.innerHTML = 'Submit Enquiry';
+    btn.disabled = false;
+
+  });
+
+}
 
 
   // ─────────────────────────────────────────────────
