@@ -62,10 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // B. Hero Parallax: GPU hardware-accelerated translate3d
-    if (heroBg) {
-      heroBg.style.transform = `scale(1.04) translate3d(0, ${lastScrollY * 0.22}px, 0)`;
-    }
+    // B. Hero BG: STATIC — no parallax transform applied
+    // (heroBg stays fixed; transform intentionally removed)
 
     // C. Highlight active navigation section
     updateActiveNav();
@@ -83,9 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('load', () => {
     cacheSectionPositions();
-    if (heroBg) {
-      heroBg.classList.add('loaded');
-    }
+    // Hero image stays static — no zoom on load
   });
 
   window.addEventListener('resize', () => {
@@ -161,9 +157,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ─────────────────────────────────────────────────
   // 4. FLOATING PARTICLES (Pausable & High-Res)
+  //    Disabled on mobile to prevent GPU flicker
   // ─────────────────────────────────────────────────
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
   const canvas = document.getElementById('particle-canvas');
-  if (canvas) {
+  if (canvas && !isMobile) {
     const ctx = canvas.getContext('2d');
     let particles = [];
     let animationFrameId;
@@ -662,27 +660,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // ─────────────────────────────────────────────────
-  // 13. GPUS FADE-IN INITIAL LOADING (will-change optimized)
+  // 13. HERO FADE-IN ON LOAD (desktop only to avoid
+  //     mobile flicker from will-change re-paints)
   // ─────────────────────────────────────────────────
-  setTimeout(() => {
-    const heroElements = document.querySelectorAll('.hero-badge, .hero-heading, .hero-sub, .hero-cta-row, .hero-indicators');
-    heroElements.forEach((el, i) => {
-      el.style.opacity = '0';
-      el.style.transform = 'translate3d(0, 16px, 0)';
-      el.style.willChange = 'opacity, transform';
-      el.style.transition = `opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1) ${i * 0.12}s, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1) ${i * 0.12}s`;
-      
-      requestAnimationFrame(() => {
+  const isMobileFade = window.matchMedia('(max-width: 768px)').matches;
+
+  if (!isMobileFade) {
+    setTimeout(() => {
+      const heroElements = document.querySelectorAll('.hero-badge, .hero-heading, .hero-sub, .hero-cta-row, .hero-indicators');
+      heroElements.forEach((el, i) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translate3d(0, 16px, 0)';
+        el.style.willChange = 'opacity, transform';
+        el.style.transition = `opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1) ${i * 0.12}s, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1) ${i * 0.12}s`;
+
         requestAnimationFrame(() => {
-          el.style.opacity = '1';
-          el.style.transform = 'translate3d(0, 0, 0)';
+          requestAnimationFrame(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translate3d(0, 0, 0)';
+          });
+        });
+
+        el.addEventListener('transitionend', function handler() {
+          el.style.willChange = '';
+          el.removeEventListener('transitionend', handler);
         });
       });
-      
-      el.addEventListener('transitionend', function handler() {
-        el.style.willChange = '';
-        el.removeEventListener('transitionend', handler);
-      });
-    });
-  }, 100);
+    }, 100);
+  }
 });
+

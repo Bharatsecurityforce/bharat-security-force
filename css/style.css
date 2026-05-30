@@ -352,12 +352,11 @@ ul { list-style: none; }
   background-image: url('../images/hero_security.png');
   background-size: cover;
   background-position: center 20%;
-  transform-origin: center;
-  will-change: transform;
-  transition: transform 10s ease-out;
   z-index: 0;
+  /* STATIC: No parallax, no zoom, no movement */
 }
-.hero-bg.loaded { transform: scale(1.04); }
+/* Remove the .loaded zoom — hero image stays fixed */
+.hero-bg.loaded { transform: none; }
 
 /* Multi-layer overlays */
 .hero-overlay {
@@ -384,13 +383,14 @@ ul { list-style: none; }
   position: absolute; top: 0; right: 0;
   width: 500px; height: 500px;
   background: radial-gradient(circle, rgba(255,153,51,0.04) 0%, transparent 70%);
-  animation: glowPulse 6s ease-in-out infinite;
+  /* Static — no animation for performance */
+  opacity: 0.6;
 }
 .tricolor-green {
   position: absolute; bottom: 20%; right: 10%;
   width: 400px; height: 400px;
   background: radial-gradient(circle, rgba(19,136,8,0.04) 0%, transparent 70%);
-  animation: glowPulse 6s ease-in-out infinite 3s;
+  opacity: 0.6;
 }
 @keyframes glowPulse {
   0%, 100% { opacity: 0.4; transform: scale(1); }
@@ -996,8 +996,10 @@ ul { list-style: none; }
   background: var(--glass);
   border: 1px solid var(--border-gold);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: var(--radius);
   padding: 16px 22px;
+  /* Gentle float — disabled on mobile via media query */
   animation: floatBadge 4s ease-in-out infinite;
 }
 @keyframes floatBadge {
@@ -1546,4 +1548,110 @@ ul { list-style: none; }
   .modal-title { font-size: 1.4rem; }
   #float-whatsapp { bottom: 20px; right: 20px; }
   .hero-heading { font-size: 2.2rem; }
+}
+
+/* ─────────────────────────────────────────────────
+   MOBILE PERFORMANCE — Anti-Flicker Optimisation
+   Targets Android Chrome, iOS Safari
+──────────────────────────────────────────────────*/
+@media (max-width: 768px) {
+
+  /* ── Hero: fully static, no motion at all ─── */
+  .hero-bg {
+    background-attachment: scroll; /* No fixed/parallax */
+    transform: none !important;
+    will-change: auto;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Disable tricolor glow elements on mobile */
+  .tricolor-saffron,
+  .tricolor-green {
+    display: none;
+  }
+
+  /* ── Disable all float/bounce animations ─── */
+  .about-img-badge,
+  .about-exp-badge {
+    animation: none;
+    transform: none;
+  }
+
+  /* ── Disable WhatsApp float bounce ─────────── */
+  #float-whatsapp {
+    animation: none;
+  }
+
+  /* ── Disable expensive backdrop-filter blurs ─ */
+  #navbar.scrolled,
+  .nav-links,
+  .hero-badge,
+  .hero-ind-item {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* ── Simplify reveal animations ─────────────── */
+  .reveal, .reveal-left, .reveal-right, .reveal-scale {
+    transition-duration: 0.5s;
+    transition-property: opacity, transform;
+  }
+  .reveal        { transform: translateY(20px); }
+  .reveal-left   { transform: translateX(-20px); }
+  .reveal-right  { transform: translateX(20px); }
+  .reveal-scale  { transform: scale(0.95); }
+
+  /* ── Disable corner glow pulse ──────────────── */
+  .about-corner-tl,
+  .about-corner-br {
+    animation: none;
+    opacity: 0.7;
+  }
+
+  /* ── Disable rotating glow background ──────── */
+  #about::before {
+    animation: none;
+  }
+
+  /* ── GPU layer for scroll container ────────── */
+  body {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* ── Reduce shadow complexity ───────────────── */
+  .about-img-frame:hover {
+    box-shadow: var(--shadow);
+  }
+
+  /* ── Force single-column trust strip on mobile  */
+  .trust-item { flex: 0 0 100%; }
+
+  /* ── Prevent hero content flash ─────────────── */
+  .hero-heading,
+  .hero-sub,
+  .hero-cta-row,
+  .hero-badge-row,
+  .hero-indicators {
+    will-change: auto;
+  }
+
+  /* ── Simpler shimmer bar on form ────────────── */
+  .contact-form::before {
+    animation: none;
+    background: linear-gradient(90deg, var(--gold), var(--olive-light));
+  }
+
+  /* ── Disable particle canvas on mobile (saves GPU) */
+  #particle-canvas {
+    display: none;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .hero-badge { font-size: 10px; padding: 6px 10px; }
+  .hero-heading { font-size: 1.9rem; }
+  .btn-primary, .btn-outline { padding: 13px 22px; font-size: 0.78rem; }
 }
