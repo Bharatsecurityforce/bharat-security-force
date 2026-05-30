@@ -355,6 +355,18 @@ ul { list-style: none; }
   z-index: 0;
   /* STATIC: No parallax, no zoom, no movement */
 }
+
+/* ─── Mobile hero image repositioning ─────────── */
+@media (max-width: 767px) {
+  .hero-bg {
+    background-position: 72% center;
+  }
+}
+@media (max-width: 480px) {
+  .hero-bg {
+    background-position: 75% top;
+  }
+}
 /* Remove the .loaded zoom — hero image stays fixed */
 .hero-bg.loaded { transform: none; }
 
@@ -736,6 +748,7 @@ ul { list-style: none; }
   transition: var(--transition);
   position: relative; z-index: 2;
   cursor: pointer;
+  pointer-events: auto;
 }
 .service-arrow svg { width: 14px; height: 14px; stroke: var(--gold); transition: transform var(--transition); }
 .service-card:hover .service-arrow { opacity: 1; transform: translateX(0); }
@@ -1375,17 +1388,29 @@ ul { list-style: none; }
 #float-whatsapp {
   position: fixed;
   bottom: 28px; right: 28px;
-  z-index: 999;
+  /* High z-index: above all sections, modals use 9000+ so stay below those */
+  z-index: 8000;
   width: 58px; height: 58px;
   border-radius: 50%;
   background: #25d366;
-  display: flex; align-items: center; justify-content: center;
+  display: flex !important;
+  align-items: center; justify-content: center;
   box-shadow: 0 6px 28px rgba(37,211,102,0.4);
-  transition: var(--transition);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: waBounce 3s ease-in-out infinite;
+  /* Ensure visibility on all browsers */
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  /* Prevent any parent overflow from clipping */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Touch-friendly minimum size */
+  min-width: 56px; min-height: 56px;
 }
-#float-whatsapp:hover { transform: scale(1.12); box-shadow: 0 10px 36px rgba(37,211,102,0.55); animation: none; }
-#float-whatsapp svg { width: 28px; height: 28px; fill: #fff; }
+#float-whatsapp:hover,
+#float-whatsapp:active { transform: scale(1.12); box-shadow: 0 10px 36px rgba(37,211,102,0.55); animation: none; }
+#float-whatsapp svg { width: 28px; height: 28px; fill: #fff; flex-shrink: 0; }
 #float-whatsapp .wa-tooltip {
   position: absolute;
   right: 72px;
@@ -1404,8 +1429,8 @@ ul { list-style: none; }
 }
 #float-whatsapp:hover .wa-tooltip { opacity: 1; }
 @keyframes waBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0%, 100% { transform: translateY(0) translateZ(0); }
+  50% { transform: translateY(-6px) translateZ(0); }
 }
 
 /* ─────────────────────────────────────────────────
@@ -1546,8 +1571,32 @@ ul { list-style: none; }
   .footer-bottom { flex-direction: column; align-items: flex-start; }
   .modal-body { padding: 24px 20px 28px; }
   .modal-title { font-size: 1.4rem; }
-  #float-whatsapp { bottom: 20px; right: 20px; }
+
+  /* WhatsApp float: slightly smaller on small phones, keep accessible */
+  #float-whatsapp {
+    bottom: 18px;
+    right: 18px;
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+    min-height: 54px;
+  }
+  #float-whatsapp svg { width: 26px; height: 26px; }
   .hero-heading { font-size: 2.2rem; }
+
+  /* Service cards: always show the Learn More arrow on mobile/touch screens */
+  .service-arrow {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+    font-size: 12px;
+    padding: 8px 0 2px;
+  }
+  /* Increase tap target size on service cards */
+  .service-card {
+    padding: 28px 22px;
+    -webkit-tap-highlight-color: rgba(201,168,76,0.1);
+    touch-action: manipulation;
+  }
 }
 
 /* ─────────────────────────────────────────────────
@@ -1578,9 +1627,25 @@ ul { list-style: none; }
     transform: none;
   }
 
-  /* ── Disable WhatsApp float bounce ─────────── */
+  /* ── Disable WhatsApp float bounce on mobile (saves battery) ─── */
+  /* DO NOT hide or display:none the WhatsApp button — keep it visible */
   #float-whatsapp {
     animation: none;
+    /* Ensure the button stays fully visible and accessible on mobile */
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* ── Service cards: always show Learn More on touch screens ──── */
+  .service-arrow {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+  }
+  .service-card {
+    -webkit-tap-highlight-color: rgba(201,168,76,0.1);
+    touch-action: manipulation;
   }
 
   /* ── Disable expensive backdrop-filter blurs ─ */
