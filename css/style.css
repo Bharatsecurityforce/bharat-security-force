@@ -1680,6 +1680,16 @@ ul { list-style: none; }
   }
 
   /* ── GPU layer for scroll container removed because it breaks position:fixed modals ── */
+  /* Instead, apply it to the block sections to prevent flicker without breaking modals */
+  section, footer {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  html, body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+  }
   /* ── Reduce shadow complexity ───────────────── */
   .about-img-frame:hover {
     box-shadow: var(--shadow);
