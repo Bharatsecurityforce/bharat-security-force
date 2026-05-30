@@ -1679,12 +1679,7 @@ ul { list-style: none; }
     animation: none;
   }
 
-  /* ── GPU layer for scroll container ────────── */
-  body {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-  }
-
+  /* ── GPU layer for scroll container removed because it breaks position:fixed modals ── */
   /* ── Reduce shadow complexity ───────────────── */
   .about-img-frame:hover {
     box-shadow: var(--shadow);
