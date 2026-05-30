@@ -421,7 +421,10 @@ ul { list-style: none; }
   position: relative;
   z-index: 5;
   padding: 130px 0 90px;
-  max-width: 800px;
+  max-width: 650px; /* Reduced from 800px to ensure text doesn't overlap the right-aligned guard */
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
 }
 
 /* Hero badge row */
@@ -446,16 +449,12 @@ ul { list-style: none; }
   letter-spacing: 2.5px;
   text-transform: uppercase;
   color: var(--gold-light);
-  animation: badgeFadeIn 0.8s ease both;
   backdrop-filter: blur(8px);
+  /* Animation removed for immediate visibility */
 }
 .hero-badge svg { width: 13px; height: 13px; stroke: var(--gold); flex-shrink: 0; }
-.hero-badge:nth-child(2) { animation-delay: 0.15s; border-color: var(--border-olive); color: var(--sage); }
+.hero-badge:nth-child(2) { border-color: var(--border-olive); color: var(--sage); }
 .hero-badge:nth-child(2) svg { stroke: var(--olive-light); }
-@keyframes badgeFadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 
 /* Heading */
 .hero-heading {
@@ -465,11 +464,7 @@ ul { list-style: none; }
   line-height: 1.06;
   color: var(--white);
   margin-bottom: 12px;
-  animation: headingReveal 1s cubic-bezier(0.4,0,0.2,1) 0.2s both;
-}
-@keyframes headingReveal {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+  /* Animation removed for immediate visibility */
 }
 .hero-heading .accent {
   color: var(--gold);
@@ -487,7 +482,7 @@ ul { list-style: none; }
   line-height: 1.8;
   max-width: 620px;
   margin-bottom: 40px;
-  animation: headingReveal 1s cubic-bezier(0.4,0,0.2,1) 0.4s both;
+  /* Animation removed */
 }
 
 .hero-cta-row {
@@ -495,7 +490,7 @@ ul { list-style: none; }
   gap: 14px;
   flex-wrap: wrap;
   margin-bottom: 56px;
-  animation: headingReveal 1s cubic-bezier(0.4,0,0.2,1) 0.55s both;
+  /* Animation removed */
 }
 
 /* Hero indicators */
@@ -506,7 +501,7 @@ ul { list-style: none; }
   border-radius: var(--radius);
   overflow: hidden;
   flex-wrap: wrap;
-  animation: headingReveal 1s cubic-bezier(0.4,0,0.2,1) 0.7s both;
+  /* Animation removed */
 }
 .hero-ind-item {
   display: flex;
