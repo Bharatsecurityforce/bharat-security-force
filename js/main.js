@@ -305,57 +305,59 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. MAGNETIC BUTTONS (LERPed Elastic Glide)
   // ─────────────────────────────────────────────────
   const magneticEls = document.querySelectorAll('.btn-primary, .btn-outline, .whatsapp-btn, .social-btn');
-  magneticEls.forEach(btn => {
-    let state = {
-      tx: 0, ty: 0,
-      cx: 0, cy: 0,
-      active: false
-    };
+  if (!isMobile) {
+    magneticEls.forEach(btn => {
+      let state = {
+        tx: 0, ty: 0,
+        cx: 0, cy: 0,
+        active: false
+      };
 
-    btn.addEventListener('mousemove', (e) => {
-      const rect = btn.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-      
-      const strength = btn.classList.contains('social-btn') ? 8 : 12;
-      state.tx = x * (strength / rect.width);
-      state.ty = y * (strength / rect.height);
-      
-      if (!state.active) {
-        state.active = true;
-        tick();
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        
+        const strength = btn.classList.contains('social-btn') ? 8 : 12;
+        state.tx = x * (strength / rect.width);
+        state.ty = y * (strength / rect.height);
+        
+        if (!state.active) {
+          state.active = true;
+          tick();
+        }
+      }, { passive: true });
+
+      btn.addEventListener('mouseleave', () => {
+        state.tx = 0;
+        state.ty = 0;
+      }, { passive: true });
+
+      function tick() {
+        // Elastic slide using linear interpolation
+        state.cx += (state.tx - state.cx) * 0.12;
+        state.cy += (state.ty - state.cy) * 0.12;
+        
+        const isSocial = btn.classList.contains('social-btn');
+        const yOffset = isSocial ? 0 : -3;
+        
+        const dx = state.tx - state.cx;
+        const dy = state.ty - state.cy;
+        
+        // Release animations when coordinates return to zero rest position
+        if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05 && state.tx === 0 && state.ty === 0) {
+          btn.style.transform = '';
+          state.cx = 0;
+          state.cy = 0;
+          state.active = false;
+        } else {
+          // GPU acceleration layer trigger via translate3d
+          btn.style.transform = `translate3d(${state.cx}px, ${state.cy + yOffset}px, 0)`;
+          requestAnimationFrame(tick);
+        }
       }
-    }, { passive: true });
-
-    btn.addEventListener('mouseleave', () => {
-      state.tx = 0;
-      state.ty = 0;
-    }, { passive: true });
-
-    function tick() {
-      // Elastic slide using linear interpolation
-      state.cx += (state.tx - state.cx) * 0.12;
-      state.cy += (state.ty - state.cy) * 0.12;
-      
-      const isSocial = btn.classList.contains('social-btn');
-      const yOffset = isSocial ? 0 : -3;
-      
-      const dx = state.tx - state.cx;
-      const dy = state.ty - state.cy;
-      
-      // Release animations when coordinates return to zero rest position
-      if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05 && state.tx === 0 && state.ty === 0) {
-        btn.style.transform = '';
-        state.cx = 0;
-        state.cy = 0;
-        state.active = false;
-      } else {
-        // GPU acceleration layer trigger via translate3d
-        btn.style.transform = `translate3d(${state.cx}px, ${state.cy + yOffset}px, 0)`;
-        requestAnimationFrame(tick);
-      }
-    }
-  });
+    });
+  }
 
 
   // ─────────────────────────────────────────────────

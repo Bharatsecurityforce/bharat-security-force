@@ -1657,26 +1657,49 @@ ul { list-style: none; }
     -webkit-backdrop-filter: none;
   }
 
-  /* ── Simplify reveal animations ─────────────── */
+  /* ── Simplify reveal animations to prevent scroll layout shifts ─────────────── */
   .reveal, .reveal-left, .reveal-right, .reveal-scale {
-    transition-duration: 0.5s;
-    transition-property: opacity, transform;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important; /* Force visibility immediately on mobile */
   }
-  .reveal        { transform: translateY(20px); }
-  .reveal-left   { transform: translateX(-20px); }
-  .reveal-right  { transform: translateX(20px); }
-  .reveal-scale  { transform: scale(0.95); }
 
   /* ── Disable corner glow pulse ──────────────── */
   .about-corner-tl,
   .about-corner-br {
-    animation: none;
+    animation: none !important;
     opacity: 0.7;
+    filter: none !important;
   }
 
   /* ── Disable rotating glow background ──────── */
-  #about::before {
-    animation: none;
+  #about::before,
+  .hero-tricolor-glow,
+  .hero-gradient-move {
+    animation: none !important;
+    display: none !important;
+  }
+
+  /* ── Disable all infinite animations and heavy filters ── */
+  *, *::before, *::after {
+    /* Aggressively strip infinite animations, blurs, and heavy shadows on mobile */
+    animation-play-state: paused !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+  }
+  
+  /* Selectively re-enable specific necessary animations (e.g. form spinner) if needed, 
+     but ensure all the problematic infinite UI loops are killed */
+  .spinner circle { animation-play-state: running !important; }
+
+  /* ── Remove all box-shadows on mobile to prevent repaints ── */
+  .service-card, .service-card:hover,
+  .trust-item:hover .trust-icon,
+  .about-img-frame, .about-img-frame:hover,
+  .why-card:hover, .contact-icon, .contact-detail:hover .contact-icon,
+  .modal-box, #navbar.scrolled {
+    box-shadow: none !important;
   }
 
   /* ── GPU layer for scroll container removed because it breaks position:fixed modals ── */
